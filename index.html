@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Library Exchange | Campus Book Sharing</title>
+  <!-- Google Font: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand" onclick="navigateTo('home')">
+        <span class="brand-icon">📚</span>
+        <div class="brand-text">
+          <span class="brand-title">CampusLib</span>
+          <span class="brand-subtitle">Hostel & Society Exchange</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="nav-menu">
+        <button class="nav-link active" onclick="navigateTo('home')" id="nav-home">
+          <span>🏠</span> Home
+        </button>
+        <button class="nav-link" onclick="navigateTo('browse')" id="nav-browse">
+          <span>🔍</span> Browse Books
+        </button>
+        <button class="nav-link" onclick="navigateTo('add')" id="nav-add">
+          <span>➕</span> Add a Book
+        </button>
+        <button class="nav-link" onclick="navigateTo('shelf')" id="nav-shelf">
+          <span>📖</span> My Shelf <span class="nav-badge" id="my-shelf-count">0</span>
+        </button>
+        <button class="nav-link" onclick="navigateTo('requests')" id="nav-requests">
+          <span>📥</span> Requests <span class="nav-badge alert-badge" id="requests-count">0</span>
+        </button>
+      </nav>
+
+      <!-- Right controls: Dark mode toggle & mobile hamburger -->
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="theme-btn" title="Toggle Light/Dark Theme" onclick="toggleDarkMode()">
+          <span id="theme-icon">🌙</span> <span id="theme-text">Dark</span>
+        </button>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Navigation">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="main-container">
+
+    <!-- 1. HOME SECTION -->
+    <section id="home-section" class="app-section">
+      <!-- Welcome Hero -->
+      <div class="hero-card">
+        <div class="hero-content">
+          <h1>Welcome to Community Library Exchange 👋</h1>
+          <p>
+            Share textbooks, novels, notes, and competitive exam guides with hostel mates, 
+            classmates, and society members. Borrow, lend, or swap books without spending a single rupee!
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="navigateTo('browse')">🔍 Explore All Books</button>
+            <button class="btn btn-secondary" onclick="navigateTo('add')">➕ Share a Book</button>
+          </div>
+        </div>
+        <div class="hero-graphic">
+          <div class="hero-badge-box">
+            <span class="big-emoji">📖</span>
+            <p><strong>Hostel Book Club</strong><br><small>Knowledge grows when shared!</small></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Statistics Cards -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon bg-blue">📚</div>
+          <div class="stat-info">
+            <h3 id="stat-total-books">0</h3>
+            <p>Total Books</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon bg-green">✅</div>
+          <div class="stat-info">
+            <h3 id="stat-available-books">0</h3>
+            <p>Available to Borrow</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon bg-red">🤝</div>
+          <div class="stat-info">
+            <h3 id="stat-borrowed-books">0</h3>
+            <p>Currently Borrowed</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon bg-orange">⏳</div>
+          <div class="stat-info">
+            <h3 id="stat-requested-books">0</h3>
+            <p>Active Requests</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recently Added Row -->
+      <div class="section-header-row">
+        <div>
+          <h2>✨ Recently Added Books</h2>
+          <p class="section-desc">Latest additions from fellow campus members</p>
+        </div>
+        <button class="btn-text" onclick="navigateTo('browse')">View All &rarr;</button>
+      </div>
+      <div id="recent-books-grid" class="books-grid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </section>
+
+    <!-- 2. BROWSE BOOKS SECTION -->
+    <section id="browse-section" class="app-section" style="display: none;">
+      <div class="section-header">
+        <h2>🔍 Browse Campus Library</h2>
+        <p class="section-desc">Search through all books listed by students across hostels and societies.</p>
+      </div>
+
+      <!-- Search, Filter & Sort Controls Bar -->
+      <div class="filter-controls-card">
+        <!-- Live Search -->
+        <div class="search-box">
+          <span class="search-icon">🔎</span>
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Search by title, author, or owner name..." 
+            oninput="handleSearchFilterChange()"
+          >
+          <button id="clear-search-btn" class="clear-btn" onclick="clearSearch()" title="Clear search">✕</button>
+        </div>
+
+        <!-- Filter and Sort Dropdowns -->
+        <div class="filter-dropdowns">
+          <div class="filter-group">
+            <label for="filter-genre">Genre:</label>
+            <select id="filter-genre" onchange="handleSearchFilterChange()">
+              <option value="All">All Genres</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Science & Math">Science & Math</option>
+              <option value="Fiction">Fiction</option>
+              <option value="Non-Fiction">Non-Fiction</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Self-Help">Self-Help</option>
+              <option value="Exam Prep">Exam Prep</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-status">Status:</label>
+            <select id="filter-status" onchange="handleSearchFilterChange()">
+              <option value="All">All Statuses</option>
+              <option value="Available">Available Only</option>
+              <option value="Requested">Requested</option>
+              <option value="Borrowed">Borrowed</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="sort-by">Sort By:</label>
+            <select id="sort-by" onchange="handleSearchFilterChange()">
+              <option value="newest">Newest First</option>
+              <option value="title-asc">Title (A to Z)</option>
+              <option value="title-desc">Title (Z to A)</option>
+              <option value="author">Author Name</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Count Bar -->
+      <div class="results-bar">
+        <span id="browse-results-count">Showing 0 books</span>
+        <button class="btn-text-small" onclick="resetFilters()">Reset Filters</button>
+      </div>
+
+      <!-- Books Grid -->
+      <div id="browse-books-grid" class="books-grid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="browse-empty-state" class="empty-state" style="display: none;">
+        <span class="empty-icon">🧐</span>
+        <h3>No books found!</h3>
+        <p>No books match your current search query or filter selection. Try clearing filters or search terms.</p>
+        <button class="btn btn-secondary" onclick="resetFilters()">Reset All Filters</button>
+      </div>
+    </section>
+
+    <!-- 3. ADD A BOOK SECTION -->
+    <section id="add-section" class="app-section" style="display: none;">
+      <div class="section-header">
+        <h2>➕ Share a Book with the Community</h2>
+        <p class="section-desc">Got a book sitting on your hostel desk? Put it up so someone in need can borrow or swap it!</p>
+      </div>
+
+      <div class="form-container">
+        <form id="add-book-form" onsubmit="handleBookSubmit(event)" novalidate>
+          <div class="form-row">
+            <!-- Book Title -->
+            <div class="form-group flex-2">
+              <label for="book-title">Book Title <span class="required">*</span></label>
+              <input type="text" id="book-title" placeholder="e.g. Introduction to Algorithms (CLRS)">
+              <small class="error-msg" id="err-title"></small>
+            </div>
+
+            <!-- Author -->
+            <div class="form-group flex-1">
+              <label for="book-author">Author <span class="required">*</span></label>
+              <input type="text" id="book-author" placeholder="e.g. Thomas H. Cormen">
+              <small class="error-msg" id="err-author"></small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Genre -->
+            <div class="form-group flex-1">
+              <label for="book-genre">Genre / Category <span class="required">*</span></label>
+              <select id="book-genre">
+                <option value="">-- Select Genre --</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Science & Math">Science & Math</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Non-Fiction">Non-Fiction</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Self-Help">Self-Help</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Other">Other</option>
+              </select>
+              <small class="error-msg" id="err-genre"></small>
+            </div>
+
+            <!-- Condition -->
+            <div class="form-group flex-1">
+              <label for="book-condition">Book Condition <span class="required">*</span></label>
+              <select id="book-condition">
+                <option value="">-- Select Condition --</option>
+                <option value="Good">Good (Like new, clean pages)</option>
+                <option value="Fair">Fair (Mild wear, some highlights)</option>
+                <option value="Worn">Worn (Dog-eared, readable)</option>
+              </select>
+              <small class="error-msg" id="err-condition"></small>
+            </div>
+
+            <!-- Exchange Type -->
+            <div class="form-group flex-1">
+              <label for="book-exchange-type">Exchange Type <span class="required">*</span></label>
+              <select id="book-exchange-type">
+                <option value="">-- Select Type --</option>
+                <option value="Lend">Lend (Borrow & return later)</option>
+                <option value="Swap">Swap (Exchange for another book)</option>
+                <option value="Giveaway">Giveaway (Free for keeps!)</option>
+              </select>
+              <small class="error-msg" id="err-exchange"></small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Owner Name -->
+            <div class="form-group flex-1">
+              <label for="book-owner-name">Your Name (Owner) <span class="required">*</span></label>
+              <input type="text" id="book-owner-name" value="Rahul Verma" placeholder="e.g. Rahul Verma">
+              <small class="error-msg" id="err-owner"></small>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="form-group flex-1">
+              <label for="book-contact">Contact Info (Hostel / Phone / Email) <span class="required">*</span></label>
+              <input type="text" id="book-contact" value="Hostel 2, Room 108 | rahul.verma@campus.edu" placeholder="e.g. Hostel 3, Room 104 / 9876543210">
+              <small class="error-msg" id="err-contact"></small>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">➕ Add Book to Library</button>
+            <button type="button" class="btn btn-secondary" onclick="resetAddForm()">Clear Form</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 4. MY SHELF SECTION -->
+    <section id="shelf-section" class="app-section" style="display: none;">
+      <div class="section-header-row">
+        <div>
+          <h2>📖 My Shelf</h2>
+          <p class="section-desc">
+            Books listed by you (<strong id="active-user-name">Rahul Verma</strong>). You can edit details, delete books, or mark them as returned.
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="navigateTo('add')">➕ Add New Book</button>
+      </div>
+
+      <!-- My Shelf Grid -->
+      <div id="my-shelf-grid" class="books-grid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+
+      <!-- Empty State for My Shelf -->
+      <div id="shelf-empty-state" class="empty-state" style="display: none;">
+        <span class="empty-icon">📚</span>
+        <h3>Your shelf is empty!</h3>
+        <p>You haven't listed any books yet. Share your textbooks or favorite novels with your hostel buddies today!</p>
+        <button class="btn btn-primary" onclick="navigateTo('add')">➕ List Your First Book</button>
+      </div>
+    </section>
+
+    <!-- 5. REQUESTS SECTION -->
+    <section id="requests-section" class="app-section" style="display: none;">
+      <div class="section-header">
+        <h2>📥 Borrow & Swap Requests</h2>
+        <p class="section-desc">Manage requests from peers who want to borrow or swap books with you.</p>
+      </div>
+
+      <!-- Requests list container -->
+      <div id="requests-list-container" class="requests-container">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+
+      <!-- Empty State for Requests -->
+      <div id="requests-empty-state" class="empty-state" style="display: none;">
+        <span class="empty-icon">📭</span>
+        <h3>No borrow requests right now</h3>
+        <p>When someone requests to borrow one of your listed books, their request will appear here with options to Accept or Decline.</p>
+        <button class="btn btn-secondary" onclick="navigateTo('browse')">Browse Library</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 1: Request to Borrow Modal -->
+  <div id="borrow-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="borrow-modal-title">🤝 Request to Borrow Book</h3>
+        <button class="modal-close-btn" onclick="closeBorrowModal()">&times;</button>
+      </div>
+      <form id="borrow-form" onsubmit="handleBorrowSubmit(event)">
+        <div class="modal-body">
+          <div class="modal-book-preview" id="borrow-modal-preview">
+            <!-- Book summary inserted by JS -->
+          </div>
+
+          <div class="form-group">
+            <label for="borrower-name">Your Full Name <span class="required">*</span></label>
+            <input type="text" id="borrower-name" placeholder="e.g. Sneha Patel" required>
+            <small class="error-msg" id="err-borrow-name"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="borrower-contact">Your Contact Info (Hostel / Phone) <span class="required">*</span></label>
+            <input type="text" id="borrower-contact" placeholder="e.g. Girls Hostel A, Room 305 / 9812345678" required>
+            <small class="error-msg" id="err-borrow-contact"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="borrow-message">Message to Owner (Optional)</label>
+            <textarea id="borrow-message" rows="3" placeholder="e.g. Hi! Need this for next week's exam preparation. Will return in 10 days!"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeBorrowModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send Request 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Edit Book Modal -->
+  <div id="edit-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>✏️ Edit Book Details</h3>
+        <button class="modal-close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form id="edit-book-form" onsubmit="handleEditSubmit(event)">
+        <input type="hidden" id="edit-book-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="edit-title">Book Title <span class="required">*</span></label>
+            <input type="text" id="edit-title" required>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-author">Author <span class="required">*</span></label>
+            <input type="text" id="edit-author" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="edit-genre">Genre <span class="required">*</span></label>
+              <select id="edit-genre" required>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Science & Math">Science & Math</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Non-Fiction">Non-Fiction</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Self-Help">Self-Help</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="edit-condition">Condition <span class="required">*</span></label>
+              <select id="edit-condition" required>
+                <option value="Good">Good</option>
+                <option value="Fair">Fair</option>
+                <option value="Worn">Worn</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="edit-exchange-type">Exchange Type <span class="required">*</span></label>
+              <select id="edit-exchange-type" required>
+                <option value="Lend">Lend</option>
+                <option value="Swap">Swap</option>
+                <option value="Giveaway">Giveaway</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="edit-status">Status</label>
+              <select id="edit-status">
+                <option value="Available">Available</option>
+                <option value="Requested">Requested</option>
+                <option value="Borrowed">Borrowed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-contact">Contact Info <span class="required">*</span></label>
+            <input type="text" id="edit-contact" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Confirm Delete Modal -->
+  <div id="delete-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box modal-box-small">
+      <div class="modal-header">
+        <h3>🗑️ Confirm Deletion</h3>
+        <button class="modal-close-btn" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to remove <strong id="delete-book-title"></strong> from your library shelf?</p>
+        <p class="text-muted"><small>This action cannot be undone.</small></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">Yes, Delete Book</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p class="footer-credit">
+        Made with 💻 & ☕ by <strong>Rahul Verma</strong>, B.Tech CSE, 1st Year
+      </p>
+      <p class="footer-sub">
+        Community Library Exchange &bull; Built with Plain HTML, CSS & Vanilla JS
+      </p>
+      <div class="footer-actions">
+        <button class="btn-reset" onclick="confirmResetDemoData()" title="Reset all library books to initial sample data">
+          🔄 Reset Demo Data
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
